@@ -1,0 +1,164 @@
+<header [formGroup]="form">
+
+  <div class="logo">
+    ♩ Cifrado <span>Musical</span>
+  </div>
+
+  <div class="header-content">
+
+    <ng-container *ngIf="viewOnly">
+
+      <input type="hidden" id="songTitle" [value]="form.value.title || ''">
+      <input type="hidden" id="songArtist" [value]="form.value.artist || ''">
+      <input type="hidden" id="currentKey" [value]="form.value.key || 'C'">
+      <input type="hidden" id="currentMode" [value]="form.value.mode || ''">
+      <input type="hidden" id="songTempo" [value]="form.value.tempo || 72">
+      <input type="hidden" id="songTime" [value]="form.value.time || '4/4'">
+
+    </ng-container>
+
+    <div class="meta-row" *ngIf="viewOnly && !hideMetadata">
+
+      <span class="meta-label">Título:</span>
+      <span class="meta-input w-title">
+        {{ form.value.title || 'Sin título' }}
+      </span>
+
+      <span class="meta-label">Artista:</span>
+      <span class="meta-input w-artist">
+        {{ form.value.artist || 'Sin artista' }}
+      </span>
+
+      <span class="meta-label">Clave:</span>
+      <span class="select-inp w-key">
+        {{ form.value.key || 'C' }}{{ form.value.mode }}
+      </span>
+
+      <span class="meta-label">Tempo:</span>
+      <span class="meta-input w-tempo">
+        {{ form.value.tempo || 72 }}
+      </span>
+
+      <span class="meta-label">Compás:</span>
+      <span class="select-inp w-time">
+        {{ form.value.time || '4/4' }}
+      </span>
+
+    </div>
+
+    <div class="meta-row" *ngIf="!viewOnly">
+
+      <input class="meta-input w-title" formControlName="title" id="songTitle" placeholder="Título">
+
+      <input class="meta-input w-artist" formControlName="artist" id="songArtist" placeholder="Artista">
+
+      <span class="meta-label">Clave:</span>
+
+      <select class="select-inp w-key" formControlName="key" id="currentKey">
+
+        <option>Ab</option>
+        <option>A</option>
+        <option>A#</option>
+        <option>Bb</option>
+        <option>B</option>
+        <option>C</option>
+        <option>C#</option>
+        <option>Db</option>
+        <option>D</option>
+        <option>D#</option>
+        <option>Eb</option>
+        <option>E</option>
+        <option>F</option>
+        <option>F#</option>
+        <option>Gb</option>
+        <option>G</option>
+        <option>G#</option>
+
+      </select>
+
+      <select class="select-inp w-mode" formControlName="mode" id="currentMode">
+
+        <option value="">Mayor</option>
+        <option value="m">Menor</option>
+
+      </select>
+
+      <span class="meta-label">Tempo:</span>
+
+      <input class="meta-input w-tempo" type="text" formControlName="tempo" id="songTempo">
+
+      <span class="meta-label">Compás:</span>
+
+      <input class="select-inp w-time" type="text" formControlName="time" id="songTime">
+
+      <button class="btn btn-ghost" id="metronomeBtn" *ngIf="!hideMetronome" (click)="toggleMetronome.emit()">
+
+        {{ isMetronomePlaying ? '■ Detener' : '♩ Iniciar' }}
+
+      </button>
+
+      <div class="metronome-volume" id="metronomeVolumeContainer" *ngIf="!hideMetronome">
+
+        <label class="meta-label">Volumen:</label>
+
+        <input type="range" min="0" max="100" formControlName="metronomeVolume" class="volume-slider"
+          id="metronomeVolumeSlider">
+
+        <span id="volumeValue">
+          {{ form.value.metronomeVolume }}%
+        </span>
+
+      </div>
+
+    </div>
+
+    <div class="header-actions">
+
+      <input type="file" id="file-input" accept=".txt" style="display: none;" (change)="fileSelected.emit($event)">
+
+      <label for="file-input" class="btn btn-ghost">
+        📂 Importar
+      </label>
+
+      <button class="btn btn-ghost" (click)="openTranspose.emit()">
+
+        🎵 Transportar
+
+      </button>
+
+      <button class="btn btn-ghost" (click)="exportTXT.emit()">
+
+        ⬇ TXT
+
+      </button>
+
+      <button class="btn btn-green" (click)="exportPDF.emit()">
+
+        ⬇ PDF
+
+      </button>
+
+      <button class="btn btn-ghost" (click)="showLoadSongDialog.emit()">
+
+        📁 Cargar
+
+      </button>
+
+      <button class="btn btn-ghost" id="youtubeToggleBtn" *ngIf="!hideYoutube" (click)="toggleYoutubePanel.emit()"
+        title="Mostrar video">
+
+        ▶
+
+      </button>
+
+      <button class="btn btn-ghost" *ngIf="!hideSave" (click)="saveSong.emit()">
+
+        💾 Guardar
+
+      </button>
+
+    </div>
+
+  </div>
+
+</header>

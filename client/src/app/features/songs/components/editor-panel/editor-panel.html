@@ -1,0 +1,87 @@
+<div class="panel-left">
+
+  <div class="pane pane-structure">
+    <div class="pane-header">
+      <span>Estructura</span>
+      <span class="pane-hint">
+        una sección por línea · ej: Intro, Verso 1, Coro 1 x2, Bridge
+      </span>
+    </div>
+
+    <textarea
+      id="structEditor"
+      placeholder="Intro&#10;Verso 1&#10;Coro 1"
+      [(ngModel)]="structureContent"
+      (input)="onContentChanged()">
+    </textarea>
+  </div>
+
+  <div class="pane pane-song">
+    <div class="pane-header">
+      <span>Letra y acordes</span>
+      <span class="pane-hint">
+        usa espacios para posicionar acordes · [SECCIÓN]
+      </span>
+    </div>
+
+    <textarea
+      #songEditor
+      id="editor"
+      placeholder="[INTRO]&#10;Ab  Db"
+      [(ngModel)]="songContent"
+      (input)="onContentChanged()">
+    </textarea>
+
+    <div class="editor-toolbar">
+      <span
+        style="font-size:10.5px;color:var(--text-muted);margin-right:2px;">
+        + Sección:
+      </span>
+
+      <button class="insert-btn" (click)="insertSection('intro')">
+        Intro
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('verse')">
+        Estrofa
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('pre-chorus')">
+        Pre-Coro
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('chorus')">
+        Coro
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('post-chorus')">
+        Post-Coro
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('bridge')">
+        Puente
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('outro')">
+        Salida
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('vamp')">
+        Vamp
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('refrain')">
+        Estribillo
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('solo')">
+        Solo
+      </button>
+
+      <button class="insert-btn" (click)="insertSection('instrumental')">
+        Instrumental
+      </button>
+    </div>
+  </div>
+
+</div>

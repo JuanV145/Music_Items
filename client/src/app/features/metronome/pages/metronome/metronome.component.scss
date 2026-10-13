@@ -1,0 +1,19 @@
+.metronomo-page {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+.metronomo-header {
+  margin-bottom: 2rem;
+}
+.metronome-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.meta-input {
+  width: 80px;
+  text-align: center;
+}

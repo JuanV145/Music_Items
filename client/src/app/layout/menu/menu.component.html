@@ -1,0 +1,22 @@
+<header class="app-header">
+  @if (isHome()) {
+  <div class="logo">
+    ♩ Cifrado <span>Musical</span>
+  </div>
+  }
+
+  <nav class="menu-wrapper" aria-label="Navegación principal">
+    <button class="menu-btn" (click)="toggleMenu()" aria-label="Toggle menu" [attr.aria-expanded]="isMenuOpen()">
+      ☰ Menú
+    </button>
+
+    <div class="dropdown-menu" [class.show]="isMenuOpen()" role="menu">
+      @for (item of menuItems; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: !!item.exact }"
+        class="dropdown-item" (click)="closeMenu()" role="menuitem">
+        {{ item.label }}
+      </a>
+      }
+    </div>
+  </nav>
+</header>

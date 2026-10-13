@@ -1,0 +1,73 @@
+<div class="modal-overlay" [class.open]="open">
+  <div class="modal">
+    <h3>🎵 Transportar Tonalidad</h3>
+
+    <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">
+      Selecciona la tonalidad destino:
+    </div>
+
+    <div class="key-grid">
+      @for (key of keyOptions; track key) {
+      <button type="button" class="key-btn" [class.active]="selectedKey === key" (click)="selectKey(key)">
+        {{ key }}
+      </button>
+      }
+    </div>
+
+    <div class="semi-row">
+      <label>Mostrar notas en:</label>
+
+      <div class="semi-ctrls">
+        <button type="button" class="key-btn" [class.active]="accidentalPref === 'sharp'"
+          (click)="setAccidentalPref('sharp')">
+          ♯ Sost.
+        </button>
+
+        <button type="button" class="key-btn" [class.active]="accidentalPref === 'flat'"
+          (click)="setAccidentalPref('flat')">
+          ♭ Bem.
+        </button>
+      </div>
+    </div>
+
+    <div class="semi-row">
+      <label>O ajusta por semitonos:</label>
+
+      <div class="semi-ctrls">
+        <button type="button" class="semi-btn" (click)="changeSemi(-1)">
+          −
+        </button>
+
+        <span class="semi-val">
+          {{ semi > 0 ? '+' + semi : semi }}
+        </span>
+
+        <button type="button" class="semi-btn" (click)="changeSemi(1)">
+          +
+        </button>
+      </div>
+    </div>
+
+    <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:14px;">
+      Actual:
+      <b style="color:var(--accent2)">
+        {{ currentKey }}{{ currentMode }}
+      </b>
+      →
+      Destino:
+      <b style="color:var(--green)">
+        {{ selectedKey }}{{ currentMode }}
+      </b>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" (click)="close()">
+        Cancelar
+      </button>
+
+      <button type="button" class="btn btn-primary" (click)="apply()">
+        Aplicar
+      </button>
+    </div>
+  </div>
+</div>

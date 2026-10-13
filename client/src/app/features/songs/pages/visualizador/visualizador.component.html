@@ -1,0 +1,41 @@
+<app-song-header [form]="songForm" [viewOnly]="true" [hideMetadata]="true" [hideMetronome]="true" [hideSave]="true"
+  [isMetronomePlaying]="isMetronomePlaying" (toggleMetronome)="toggleMetronome()"
+  (fileSelected)="onFileSelected($event)" (openTranspose)="openTranspose()" (exportTXT)="exportTXT()"
+  (exportPDF)="exportPDF()" (showLoadSongDialog)="showLoadSongDialog()" (toggleYoutubePanel)="toggleYoutubePanel()">
+</app-song-header>
+
+<div class="workspace">
+
+  <app-editor-panel [structureContent]="structureContent" [songContent]="songContent" (textChanged)="onEditorChange()">
+  </app-editor-panel>
+
+  <app-song-preview [data]="previewData" (statsChanged)="onPreviewStatsChanged($event)">
+  </app-song-preview>
+
+  <app-youtube-panel [open]="isYoutubePanelOpen">
+  </app-youtube-panel>
+</div>
+
+<div class="status-bar">
+  <span>
+    Secciones: <b>{{ previewStats.sections }}</b>
+  </span>
+
+  <span>
+    Líneas: <b>{{ previewStats.lines }}</b>
+  </span>
+
+  <span>
+    Acordes únicos: <b>{{ previewStats.chords }}</b>
+  </span>
+
+  <span style="margin-left:auto;color:var(--accent2)">
+  </span>
+</div>
+
+<app-transpose-modal [open]="isTransposeOpen" [currentKey]="songForm.get('key')?.value || 'C'"
+  [currentMode]="songForm.get('mode')?.value || ''" (cancel)="closeTranspose()" (applied)="applyTranspose($event)">
+</app-transpose-modal>
+
+<app-song-dialog *ngIf="showSongDialog" (songSelected)="onSongSelected($event)" (closed)="closeSongDialog()">
+</app-song-dialog>

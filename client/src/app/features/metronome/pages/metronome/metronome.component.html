@@ -1,0 +1,24 @@
+<div class="metronomo-page">
+  <header class="metronomo-header">
+    <div class="metronome-controls">
+      <span class="meta-label">Tempo (BPM):</span>
+      <input class="meta-input w-tempo" id="songTempo" type="text" value="72" [(ngModel)]="tempo" (ngModelChange)="onTempoChange()">
+      <button
+        class="btn"
+        [class.btn-green]="isMetronomePlaying"
+        [class.btn-ghost]="!isMetronomePlaying"
+        (click)="toggleMetronome()"
+      >
+        {{ isMetronomePlaying ? '■ Detener' : '♩ Iniciar' }}
+      </button>
+      <div class="metronome-volume" id="metronomeVolumeContainer">
+          <label class="meta-label" for="metronomeVolumeSlider">Volumen:</label>
+          <input type="range" min="0" max="100" [(ngModel)]="metronomeVolume" class="volume-slider" id="metronomeVolumeSlider">
+          <span id="volumeValue">{{ metronomeVolume * 100 }}%</span>
+      </div>
+    </div>
+  </header>
+  <div class="metronomo-content">
+    <p>Utiliza el metrónomo para practicar a tempo constante. Adjust the BPM as needed.</p>
+  </div>
+</div>

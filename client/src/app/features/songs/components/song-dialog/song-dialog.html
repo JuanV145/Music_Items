@@ -1,0 +1,63 @@
+<div class="modal-overlay open" (click)="onOverlayClick($event)">
+
+    <div class="modal">
+
+        <h3>📁 Canciones Guardadas</h3>
+
+        <div class="songs-container">
+
+            @if (songs.length === 0) {
+            <div class="message">
+                No hay canciones cargadas
+            </div>
+            }
+
+            @if (songs.length > 0) {
+            <div class="songs-list">
+
+                @for (song of songs; track song.id) {
+                <div class="song-item">
+
+                    <div class="song-info">
+                        <div class="song-title">
+                            {{ song.title }}
+                        </div>
+
+                        <div class="song-details">
+                            {{ song.artist || 'Artista desconocido' }}
+                            •
+                            {{ song.key_root }}{{ song.key_mode }}
+                            •
+                            {{ song.tempo }} BPM
+                            •
+                            {{ song.time_signature }}
+                        </div>
+                    </div>
+
+                    <div class="song-actions">
+                        <button type="button" class="btn btn-primary" (click)="loadSong(song)">
+                            Cargar
+                        </button>
+
+                        <button type="button" class="btn btn-ghost" (click)="deleteSong(song)">
+                            Eliminar
+                        </button>
+                    </div>
+
+                </div>
+                }
+
+            </div>
+            }
+
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" (click)="close()">
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+
+</div>

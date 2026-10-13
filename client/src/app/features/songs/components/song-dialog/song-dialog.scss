@@ -1,0 +1,77 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 400px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.songs-container {
+  margin-bottom: 15px;
+}
+
+.songs-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.song-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.song-title {
+  font-weight: bold;
+}
+
+.song-details {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 3px;
+}
+
+.song-date {
+  margin-top: 5px;
+  font-size: 0.8em;
+  color: #999;
+}
+
+.song-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 5px;
+}
+
+.message {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+.error {
+  color: #e74c3c;
+  padding: 20px;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
