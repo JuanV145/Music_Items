@@ -1,24 +1,131 @@
 <div class="metronomo-page">
   <header class="metronomo-header">
-    <div class="metronome-controls">
-      <span class="meta-label">Tempo (BPM):</span>
-      <input class="meta-input w-tempo" id="songTempo" type="text" value="72" [(ngModel)]="tempo" (ngModelChange)="onTempoChange()">
+    <section class="tempo-card" aria-label="Control de tempo">
+      <div class="tempo-card-top">
+        <span class="playback-state" [class.is-playing]="isMetronomePlaying">
+          <span class="state-dot" aria-hidden="true"></span>
+          {{ isMetronomePlaying ? 'EN MARCHA' : 'LISTO PARA PRACTICAR' }}
+        </span>
+        <span class="tempo-index">01 <i></i> TEMPO</span>
+      </div>
+
+      <div class="tempo-main">
+        <label class="tempo-label" for="songTempo">VELOCIDAD</label>
+        <div class="tempo-value-wrap">
+          <input class="meta-input w-tempo" id="songTempo" type="text" inputmode="numeric" aria-label="Tempo en pulsos por minuto" value="72" [(ngModel)]="tempo" (ngModelChange)="onTempoChange()">
+          <span class="tempo-unit">BPM</span>
+        </div>
+      </div>
+
       <button
+        type="button"
         class="btn"
         [class.btn-green]="isMetronomePlaying"
         [class.btn-ghost]="!isMetronomePlaying"
+        [attr.aria-pressed]="isMetronomePlaying"
         (click)="toggleMetronome()"
       >
-        {{ isMetronomePlaying ? '■ Detener' : '♩ Iniciar' }}
+        <span class="button-icon" aria-hidden="true">{{ isMetronomePlaying ? '■' : '▶' }}</span>
+        {{ isMetronomePlaying ? 'Detener metrónomo' : 'Iniciar metrónomo' }}
+        <span class="button-arrow" aria-hidden="true">{{ isMetronomePlaying ? 'Ⅱ' : '↗' }}</span>
       </button>
-      <div class="metronome-volume" id="metronomeVolumeContainer">
-          <label class="meta-label" for="metronomeVolumeSlider">Volumen:</label>
-          <input type="range" min="0" max="100" [(ngModel)]="metronomeVolume" class="volume-slider" id="metronomeVolumeSlider">
-          <span id="volumeValue">{{ metronomeVolume * 100 }}%</span>
-      </div>
-    </div>
+      <p class="tempo-hint">Elige una velocidad cómoda y empieza cuando quieras.</p>
+    </section>
   </header>
-  <div class="metronomo-content">
-    <p>Utiliza el metrónomo para practicar a tempo constante. Adjust the BPM as needed.</p>
-  </div>
+
+  <main class="metronomo-content">
+    <div class="settings-grid">
+      <section class="settings-card rhythm-card" aria-labelledby="rhythm-title">
+        <div class="card-heading">
+          <span class="card-index">02 / AJUSTES</span>
+          <h2 id="rhythm-title">Ritmo y medida</h2>
+          <p>Adapta el pulso a la música que estás practicando.</p>
+        </div>
+
+        <div class="accent-controls">
+          <div class="accent-control">
+            <label class="accent-control-label" for="meterSelect">Compás</label>
+            <div class="select-wrap">
+              <select id="meterSelect" [(ngModel)]="beatsPerMeasure" (ngModelChange)="onBeatsPerMeasureChange()">
+                <option value="2">2/4</option>
+                <option value="3">3/4</option>
+                <option value="4" selected>4/4</option>
+                <option value="6">6/8</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+
+          <div class="accent-control">
+            <label class="accent-control-label" for="subdivisionSelect">Subdivisión</label>
+            <div class="select-wrap">
+              <select id="subdivisionSelect" [(ngModel)]="subdivisionsPerBeat" (ngModelChange)="onSubdivisionsChange()">
+                <option value="1" aria-label="1x (Sin subdivisión)">𝅝</option>
+                <option value="2" aria-label="2x (Corcheada)">♪♪</option>
+                <option value="3" aria-label="3x (Tresillo)">♪♪♪</option>
+                <option value="4" aria-label="4x (Semicorcheada)">♪♪♪♪</option>
+                <option value="6" aria-label="6x (Sextillos)">♪♪♪♪♪♪</option>
+                <option value="8" aria-label="8x (Fusa)">♪♪♪♪♪♪♪♪</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-card volume-card" aria-labelledby="volume-title">
+        <div class="card-heading">
+          <span class="card-index">03 / ESCUCHA</span>
+          <h2 id="volume-title">Nivel de sonido</h2>
+          <p>Encuentra el volumen que mejor te acompaña.</p>
+        </div>
+
+        <div class="metronome-volume" id="metronomeVolumeContainer">
+          <div class="volume-label-row">
+            <label class="accent-control-label" for="metronomeVolumeSlider">Volumen</label>
+            <span id="volumeValue">{{ metronomeVolume | number: '1.0-0' }}<small>%</small></span>
+          </div>
+          <input type="range" min="0" max="100" [(ngModel)]="metronomeVolume" class="volume-slider" id="metronomeVolumeSlider" aria-label="Volumen del metrónomo">
+          <div class="volume-scale" aria-hidden="true"><span>SILENCIO</span><span>100%</span></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="beat-panel" aria-labelledby="beat-title">
+      <div class="beat-panel-heading">
+        <div>
+          <span class="card-index">04 / SEGUIMIENTO</span>
+          <h2 id="beat-title">Pulso del compás</h2>
+          <p>Selecciona un tiempo para activar o quitar su acento.</p>
+        </div>
+        <span class="beat-count"><span class="beat-count-dot" aria-hidden="true"></span>{{ beatsPerMeasure }} <small>pulsos</small></span>
+      </div>
+
+      <div class="beat-scroll-container">
+        <div class="beat-scroll-track">
+          <button type="button" class="beat" *ngFor="let subdivision of subdivisionsArray; let i = index"
+                  [class.active]="currentSubdivision === subdivision"
+                  [class.strong-beat]="((subdivision - 1) % this.subdivisionsPerBeat) === 0"
+                  [class.accent-beat]="metronome.accentBeats().has(getBeatNumberForSubdivision(subdivision)) && ((subdivision - 1) % this.subdivisionsPerBeat) === 0"
+                  [attr.aria-pressed]="metronome.accentBeats().has(getBeatNumberForSubdivision(subdivision))"
+                  [attr.aria-label]="'Pulso ' + getSubdivisionDisplay(subdivision) + (metronome.accentBeats().has(getBeatNumberForSubdivision(subdivision)) ? ', con acento' : ', sin acento')"
+                  (click)="metronome.toggleAccentBeat(getBeatNumberForSubdivision(subdivision))">
+            <span class="beat-value">
+              @if (((subdivision - 1) % this.subdivisionsPerBeat) === 0) {
+                {{ getSubdivisionDisplay(subdivision) }}
+              } @else {
+                <span class="beat-number">{{ getBeatNumberForSubdivision(subdivision) }}</span><small class="beat-decimal">.{{ ((subdivision - 1) % this.subdivisionsPerBeat) + 1 }}</small>
+              }
+            </span>
+            <span class="beat-accent-mark" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="beat-legend" aria-label="Leyenda de los pulsos">
+        <span><i class="legend-dot is-accent" aria-hidden="true"></i> Acento activado</span>
+        <span><i class="legend-dot is-active" aria-hidden="true"></i> Pulso actual</span>
+      </div>
+    </section>
+  </main>
 </div>

@@ -19,24 +19,148 @@
 }
 
 .pane-header {
-    background: #eee;
-    padding: 0.5rem 1rem;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-    flex-shrink: 0;
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(100deg, #191b27, #151720);
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+}
+
+.pane-title {
+    flex: 0 0 auto;
+}
+
+.zoom-controls {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.2rem;
+    margin-left: auto;
+    padding: 0.2rem;
+    border: 1px solid rgba(167, 139, 250, 0.18);
+    border-radius: 8px;
+    background: rgba(10, 12, 18, 0.42);
+}
+
+.zoom-button,
+.zoom-reset {
+    display: inline-grid;
+    min-width: 28px;
+    height: 27px;
+    place-items: center;
+    padding: 0 0.35rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.zoom-button:hover:not(:disabled),
+.zoom-reset:hover {
+    background: rgba(124, 106, 247, 0.17);
+    color: #fff;
+}
+
+.zoom-button:disabled {
+    cursor: default;
+    opacity: 0.38;
+}
+
+.zoom-button:focus-visible,
+.zoom-reset:focus-visible {
+    outline: 2px solid var(--accent2);
+    outline-offset: 1px;
+}
+
+.zoom-value {
+    min-width: 2.8rem;
+    color: var(--text);
+    font-size: 0.65rem;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.zoom-reset {
+    min-width: 38px;
+    color: var(--accent2);
+    font-size: 0.62rem;
+}
+
+.pane-header::after {
+    color: var(--accent2);
+    content: 'LIVE PREVIEW';
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
 }
 
 .preview-scroll {
+    display: flex;
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
+    flex-direction: column;
     overflow-y: auto;
-    overflow-x: hidden;
-    padding: 20px 24px;
-    background: #eeece8;
+    overflow-x: auto;
+    padding: clamp(0.8rem, 2vw, 1.5rem);
+    background:
+        radial-gradient(ellipse at 85% 5%, rgba(124, 106, 247, 0.08), transparent 40%),
+        #11131b;
     align-items: flex-start;
     scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 #f1f1f1;
+    scrollbar-color: var(--accent) #191b25;
+}
+
+.preview-empty {
+    display: grid;
+    width: 100%;
+    min-height: 260px;
+    flex: 1 0 auto;
+    align-content: center;
+    justify-items: center;
+    gap: 0.65rem;
+    box-sizing: border-box;
+    padding: 2rem 1.25rem;
+    border: 1px dashed rgba(167, 139, 250, 0.2);
+    border-radius: 12px;
+    background: radial-gradient(circle at center, rgba(124, 106, 247, 0.09), transparent 62%);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.preview-empty-mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    border-radius: 12px;
+    background: rgba(124, 106, 247, 0.1);
+    color: var(--accent2);
+    font-size: 1.35rem;
+}
+
+.preview-empty strong {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.preview-empty > span:last-child {
+    font-size: 0.72rem;
 }
 
 .preview-scroll::-webkit-scrollbar {
@@ -44,30 +168,32 @@
 }
 
 .preview-scroll::-webkit-scrollbar-track {
-    background: #f1f1f1;
     border-radius: 5px;
+    background: #191b25;
 }
 
 .preview-scroll::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    border: 2px solid #191b25;
     border-radius: 5px;
-    border: 2px solid #f1f1f1;
+    background: #5547b6;
 }
 
 .preview-scroll::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: var(--accent2);
 }
 
 :host ::ng-deep .chart-page {
-    background: #fff;
+    width: max-content;
+    min-width: min(100%, 780px);
     max-width: 1300px;
-    width: 100%;
     height: auto;
     min-height: 0;
     margin: 0 auto;
-    padding: 24px 28px;
-    border-radius: 4px;
-    box-shadow: 0 4px 28px rgba(0, 0, 0, .14);
+    padding: clamp(1.2rem, 2.5vw, 2rem);
+    border: 1px solid #e6e3de;
+    border-radius: 12px;
+    background: #fbfaf8;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(0, 0, 0, 0.12);
     font-family: 'Inter', sans-serif;
     overflow: visible;
     flex: none;
@@ -323,6 +449,11 @@
 
 :host ::ng-deep .sl-6 {
     color: #b45309;
+}
+
+@media (max-width: 480px) {
+    .pane-header { padding-inline: 0.7rem; }
+    .pane-header::after { display: none; }
 }
 
 @media print {

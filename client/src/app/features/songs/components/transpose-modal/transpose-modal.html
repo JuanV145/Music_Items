@@ -1,73 +1,72 @@
 <div class="modal-overlay" [class.open]="open">
-  <div class="modal">
-    <h3>🎵 Transportar Tonalidad</h3>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="transpose-title">
+    <header class="modal-heading">
+      <div class="modal-mark" aria-hidden="true">♯</div>
+      <div class="heading-copy">
+        <span class="eyebrow">EDICIÓN ARMÓNICA</span>
+        <h3 id="transpose-title">Transportar tonalidad</h3>
+      </div>
+      <button type="button" class="close-button" aria-label="Cerrar" (click)="close()">×</button>
+    </header>
 
-    <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">
-      Selecciona la tonalidad destino:
-    </div>
+    <p class="modal-intro">Elige la nueva tonalidad o ajusta el cambio en semitonos.</p>
 
-    <div class="key-grid">
-      @for (key of keyOptions; track key) {
-      <button type="button" class="key-btn" [class.active]="selectedKey === key" (click)="selectKey(key)">
-        {{ key }}
-      </button>
-      }
-    </div>
+    <section class="key-section" aria-label="Tonalidad de destino">
+      <div class="section-label">TONALIDAD DESTINO</div>
+      <div class="key-grid">
+        @for (key of keyOptions; track key) {
+        <button type="button" class="key-btn" [class.active]="selectedKey === key" [attr.aria-pressed]="selectedKey === key"
+          (click)="selectKey(key)">
+          {{ key }}
+        </button>
+        }
+      </div>
+    </section>
 
-    <div class="semi-row">
-      <label>Mostrar notas en:</label>
-
-      <div class="semi-ctrls">
+    <div class="settings-row">
+      <div class="setting-copy">
+        <span class="setting-title">Notación</span>
+        <span class="setting-description">Cómo mostrar las alteraciones</span>
+      </div>
+      <div class="semi-ctrls segmented-control" role="group" aria-label="Preferencia de alteraciones">
         <button type="button" class="key-btn" [class.active]="accidentalPref === 'sharp'"
-          (click)="setAccidentalPref('sharp')">
+          [attr.aria-pressed]="accidentalPref === 'sharp'" (click)="setAccidentalPref('sharp')">
           ♯ Sost.
         </button>
-
         <button type="button" class="key-btn" [class.active]="accidentalPref === 'flat'"
-          (click)="setAccidentalPref('flat')">
+          [attr.aria-pressed]="accidentalPref === 'flat'" (click)="setAccidentalPref('flat')">
           ♭ Bem.
         </button>
       </div>
     </div>
 
-    <div class="semi-row">
-      <label>O ajusta por semitonos:</label>
-
-      <div class="semi-ctrls">
-        <button type="button" class="semi-btn" (click)="changeSemi(-1)">
-          −
-        </button>
-
-        <span class="semi-val">
-          {{ semi > 0 ? '+' + semi : semi }}
-        </span>
-
-        <button type="button" class="semi-btn" (click)="changeSemi(1)">
-          +
-        </button>
+    <div class="settings-row semitone-row">
+      <div class="setting-copy">
+        <span class="setting-title">Ajuste fino</span>
+        <span class="setting-description">Desplazar por semitonos</span>
+      </div>
+      <div class="semi-ctrls stepper" role="group" aria-label="Ajustar semitonos">
+        <button type="button" class="semi-btn" aria-label="Bajar un semitono" (click)="changeSemi(-1)">−</button>
+        <output class="semi-val" aria-live="polite">{{ semi > 0 ? '+' + semi : semi }}</output>
+        <button type="button" class="semi-btn" aria-label="Subir un semitono" (click)="changeSemi(1)">+</button>
       </div>
     </div>
 
-    <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:14px;">
-      Actual:
-      <b style="color:var(--accent2)">
-        {{ currentKey }}{{ currentMode }}
-      </b>
-      →
-      Destino:
-      <b style="color:var(--green)">
-        {{ selectedKey }}{{ currentMode }}
-      </b>
+    <div class="key-preview" aria-live="polite">
+      <div class="key-preview-item">
+        <span>ACTUAL</span>
+        <strong>{{ currentKey }}{{ currentMode }}</strong>
+      </div>
+      <span class="key-arrow" aria-hidden="true">→</span>
+      <div class="key-preview-item destination">
+        <span>NUEVA TONALIDAD</span>
+        <strong>{{ selectedKey }}{{ currentMode }}</strong>
+      </div>
     </div>
 
-    <div class="modal-actions">
-      <button type="button" class="btn btn-ghost" (click)="close()">
-        Cancelar
-      </button>
-
-      <button type="button" class="btn btn-primary" (click)="apply()">
-        Aplicar
-      </button>
-    </div>
-  </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn btn-ghost" (click)="close()">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)="apply()">Aplicar cambio</button>
+    </footer>
+  </section>
 </div>

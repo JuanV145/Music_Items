@@ -29,7 +29,20 @@ export class SongPreviewComponent implements AfterViewInit, OnChanges {
   @ViewChild('chartPage')
   chartPage!: ElementRef<HTMLElement>;
 
+  readonly minZoom = 0.5;
+  readonly maxZoom = 2;
+  zoomLevel = 1;
+
   private viewReady = false;
+
+  get zoomPercent(): number {
+    return Math.round(this.zoomLevel * 100);
+  }
+
+  get hasContent(): boolean {
+    return !!this.data && [this.data.title, this.data.artist, this.data.structure, this.data.songText]
+      .some(value => String(value ?? '').trim().length > 0);
+  }
 
   constructor(private previewRenderer: PreviewRendererService) { }
 
@@ -42,6 +55,17 @@ export class SongPreviewComponent implements AfterViewInit, OnChanges {
     if (changes['data'] && this.viewReady) {
       this.render();
     }
+  }
+
+  changeZoom(amount: number): void {
+    this.zoomLevel = Math.min(
+      this.maxZoom,
+      Math.max(this.minZoom, Math.round((this.zoomLevel + amount) * 10) / 10)
+    );
+  }
+
+  resetZoom(): void {
+    this.zoomLevel = 1;
   }
 
   private render(): void {

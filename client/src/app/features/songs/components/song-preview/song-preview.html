@@ -1,9 +1,23 @@
 <div class="panel-preview">
   <div class="pane-header">
-    Vista Previa
+    <span class="pane-title">Vista Previa</span>
+    <div class="zoom-controls" role="group" aria-label="Controles de zoom de la vista previa">
+      <button type="button" class="zoom-button" aria-label="Disminuir zoom" title="Disminuir zoom"
+        [disabled]="zoomLevel <= minZoom" (click)="changeZoom(-0.1)">−</button>
+      <output class="zoom-value" aria-live="polite">{{ zoomPercent }}%</output>
+      <button type="button" class="zoom-button" aria-label="Aumentar zoom" title="Aumentar zoom"
+        [disabled]="zoomLevel >= maxZoom" (click)="changeZoom(0.1)">+</button>
+      <button type="button" class="zoom-reset" aria-label="Restablecer zoom al 100%" title="Restablecer zoom"
+        (click)="resetZoom()">100%</button>
+    </div>
   </div>
 
   <div class="preview-scroll">
-    <div #chartPage class="chart-page" id="chartPage"></div>
+    <div class="preview-empty" *ngIf="!hasContent" role="status">
+      <span class="preview-empty-mark" aria-hidden="true">♫</span>
+      <strong>Aquí se mostrará la canción cargada</strong>
+      <span>Carga o importa una canción para comenzar.</span>
+    </div>
+    <div #chartPage class="chart-page" id="chartPage" [hidden]="!hasContent" [style.zoom]="zoomLevel"></div>
   </div>
 </div>

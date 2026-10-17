@@ -1,8 +1,4 @@
-<header [formGroup]="form">
-
-  <div class="logo">
-    ♩ Cifrado <span>Musical</span>
-  </div>
+<header [formGroup]="form" [class.view-only]="viewOnly">
 
   <div class="header-content">
 
@@ -114,46 +110,63 @@
 
     <div class="header-actions">
 
-      <input type="file" id="file-input" accept=".txt" style="display: none;" (change)="fileSelected.emit($event)">
+      <input *ngIf="!viewOnly" type="file" id="file-input" accept=".txt" style="display: none;"
+        (change)="fileSelected.emit($event)">
 
-      <label for="file-input" class="btn btn-ghost">
-        📂 Importar
+      <label *ngIf="!viewOnly" for="file-input" class="btn btn-ghost">
+        Importar
       </label>
-
-      <button class="btn btn-ghost" (click)="openTranspose.emit()">
-
-        🎵 Transportar
-
-      </button>
-
-      <button class="btn btn-ghost" (click)="exportTXT.emit()">
-
-        ⬇ TXT
-
-      </button>
-
-      <button class="btn btn-green" (click)="exportPDF.emit()">
-
-        ⬇ PDF
-
-      </button>
 
       <button class="btn btn-ghost" (click)="showLoadSongDialog.emit()">
 
-        📁 Cargar
+        <svg class="load-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 3v10.5m0 0 3.5-3.5m-3.5 3.5-3.5-3.5M4 14.5h4.5l1.3 2h4.4l1.3-2H20V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4.5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" />
+        </svg>
+        Cargar
+
+      </button>
+
+      <button class="btn btn-ghost" (click)="openTranspose.emit()">
+
+        <svg class="transpose-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.3" />
+          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.1" />
+          <path d="M12 3v3M12 18v3M3 12h3m12 0h3M5.64 5.64l2.12 2.12m8.48 8.48 2.12 2.12m0-12.72-2.12 2.12m-8.48 8.48-2.12 2.12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.1" />
+          <path d="m12 8.8 2.4 3.2-2.4 3.2-2.4-3.2L12 8.8Z" fill="currentColor" />
+        </svg>
+        Transportar
+
+      </button>
+
+      <button class="btn btn-ghost" (click)="exportPDF.emit()">
+
+        <svg class="adobe-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="#eb1000" d="M1.5 22 9 2h3.4L5 22H1.5Zm21 0L15 2h-3.4L19 22h3.5ZM6.2 15.8h11.6l1.3 3.4H4.9l1.3-3.4Z" />
+        </svg>
+        PDF
 
       </button>
 
       <button class="btn btn-ghost" id="youtubeToggleBtn" *ngIf="!hideYoutube" (click)="toggleYoutubePanel.emit()"
         title="Mostrar video">
 
-        ▶
+        <svg class="youtube-logo" viewBox="0 0 24 17" aria-hidden="true" focusable="false">
+          <path fill="#ff0033" d="M23.5 2.7a3 3 0 0 0-2.1-2.1C19.6 0 12 0 12 0S4.4 0 2.6.6A3 3 0 0 0 .5 2.7 31.4 31.4 0 0 0 0 8.5s0 3.8.5 5.8a3 3 0 0 0 2.1 2.1c1.8.6 9.4.6 9.4.6s7.6 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 8.5s0-3.8-.5-5.8Z" />
+          <path fill="#fff" d="m9.6 12 6.3-3.5-6.3-3.5V12Z" />
+        </svg>
+        YouTube
+
+      </button>
+
+      <button *ngIf="!viewOnly" class="btn btn-ghost" (click)="exportTXT.emit()">
+
+        TXT
 
       </button>
 
       <button class="btn btn-ghost" *ngIf="!hideSave" (click)="saveSong.emit()">
 
-        💾 Guardar
+        Guardar
 
       </button>
 

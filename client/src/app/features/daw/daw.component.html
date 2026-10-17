@@ -1,0 +1,193 @@
+<div class="daw-container">
+  <header class="toolbar">
+    <div class="toolbar-group toolbar-project">
+      <button type="button" (click)="addTrack()" title="Importar una o varias pistas de audio">＋ Añadir pistas</button>
+    </div>
+
+    <div class="toolbar-group transport-controls" aria-label="Transporte">
+      <button type="button" (click)="play()" [disabled]="state.tracks.length === 0 || state.isPlaying" title="Reproducir desde el cursor">▶</button>
+      <button type="button" (click)="pause()" [disabled]="!state.isPlaying" title="Pausar">Ⅱ</button>
+      <button type="button" (click)="stop()" title="Detener y volver al inicio">■</button>
+      <span class="transport-time">{{ formatTime(currentTime) }} / {{ formatTime(getProjectDuration()) }}</span>
+    </div>
+    <input #fileInput class="visually-hidden" type="file" multiple accept=".wav,.mp3,audio/wav,audio/mpeg" (change)="onFileSelect($event)">
+  </header>
+
+  <main class="daw-workspace">
+    <aside class="track-panel">
+      <div class="track-panel-header" [style.height.px]="RULER_HEIGHT">
+        <div><strong>Pistas</strong><span class="track-count">{{ state.tracks.length }}</span></div>
+        <button type="button" class="icon-button" (click)="openImport()" title="Importar pista">＋</button>
+      </div>
+      <div #trackList class="track-list" (scroll)="onTrackListScroll()">
+        <div *ngFor="let track of state.tracks; let i = index; trackBy: trackById" class="track-header-row"
+             [style.height.px]="TRACK_HEIGHT" [class.muted]="track.muted" [class.solo]="track.solo">
+          <div class="track-header-main">
+            <input type="color" class="track-color-picker" [ngModel]="getTrackColor(track)"
+                   (ngModelChange)="onTrackColorChange(track.id, $event)" [attr.aria-label]="'Color de ' + track.name"
+                   title="Cambiar color de pista">
+            <span class="track-number">{{ i + 1 }}</span>
+            <input class="track-name" type="text" [ngModel]="track.name" (ngModelChange)="onTrackNameChange(track.id, $event)" aria-label="Nombre de pista">
+          </div>
+          <div class="track-header-controls">
+            <button type="button" class="mute-btn" [class.active]="track.muted" (click)="toggleMute(track.id)" [attr.aria-pressed]="track.muted" title="Mute">M</button>
+            <button type="button" class="solo-btn" [class.active]="track.solo" (click)="toggleSolo(track.id)" [attr.aria-pressed]="track.solo" title="Solo">S</button>
+            <button type="button" class="remove-btn" (click)="removeTrack(track.id)" title="Eliminar pista" aria-label="Eliminar pista">×</button>
+            <span class="pitch-label">PITCH</span>
+            <input class="pitch-input" type="number" [min]="MIN_SEMITONES" [max]="MAX_SEMITONES" step="1"
+                   [ngModel]="getTrackPitchDraft(track.id)"
+                   (ngModelChange)="setTrackPitchDraft(track.id, $event)"
+                   (keydown.enter)="applyTrackPitch(track.id)"
+                   title="Offset de esta pista, se suma al pitch global"
+                   aria-label="Pitch de pista en semitonos">
+            <button type="button" class="pitch-apply-track" (click)="applyTrackPitch(track.id)"
+                    [disabled]="isTrackBusy(track.id)"
+                    aria-label="Aplicar pitch de pista">
+              {{ trackPitchLabel(track.id) }}
+            </button>
+          </div>
+        </div>
+        <div *ngIf="state.tracks.length === 0" class="empty-tracks">
+          Importa varios WAV o MP3 para empezar una sesión multipista.
+        </div>
+      </div>
+    </aside>
+
+    <section class="timeline-panel" aria-label="Área de arreglos">
+      <div class="timeline-overlay-controls">
+        <button type="button" (click)="zoomOut()" title="Alejar el zoom">−</button>
+        <span>{{ zoomLevel.toFixed(2) }}×</span>
+        <button type="button" (click)="zoomIn()" title="Acercar el zoom">＋</button>
+        <button type="button" (click)="scrollToPlayhead()" title="Seguir el cursor">⌖</button>
+      </div>
+      <div #timelineViewport class="timeline-viewport" (scroll)="onTimelineScroll()" (click)="onTimelineClick($event)">
+        <div class="timeline-content" [style.width.px]="getTimelineWidth()" [style.minHeight.px]="getTimelineContentHeight()">
+          <div class="time-ruler" [style.height.px]="RULER_HEIGHT">
+            <div *ngFor="let mark of getTimeMarks(); trackBy: trackByTime" class="time-mark" [style.left.px]="timeToPixels(mark.time)">
+              <span class="time-label">{{ mark.label }}</span>
+            </div>
+          </div>
+          <div class="timeline-grid" [style.top.px]="RULER_HEIGHT">
+            <div *ngFor="let line of getGridLines(); trackBy: trackByTime" class="grid-line" [style.left.px]="timeToPixels(line.time)"></div>
+          </div>
+          <div *ngFor="let track of state.tracks; let i = index; trackBy: trackById" class="timeline-track"
+               [style.top.px]="RULER_HEIGHT + i * TRACK_HEIGHT" [style.height.px]="TRACK_HEIGHT"
+               [class.alt]="i % 2 === 1" [class.muted]="track.muted" [class.solo]="track.solo">
+            <div *ngIf="track.audioBuffer" class="audio-clip" [style.left.px]="timeToPixels(track.clipOffset)"
+                 [style.width.px]="Math.max(8, timeToPixels(track.clipDuration))"
+                 [style.backgroundColor]="getTrackColor(track)" [class.selected]="selectedClip?.trackId === track.id"
+                 [title]="track.name + ' · ' + formatTime(track.clipOffset) + ' · ' + formatTime(track.clipDuration)"
+                 (mousedown)="onClipMouseDown($event, track)" (click)="$event.stopPropagation()" (dblclick)="onClipDoubleClick(track)">
+              <canvas class="waveform-canvas" [attr.data-track-id]="track.id"
+                      [width]="getCanvasWidth(track)" height="44" aria-hidden="true"></canvas>
+              <div class="clip-edge clip-edge-left" title="Recortar inicio" (mousedown)="onResizeHandleMouseDown($event, track, 'left')"></div>
+              <div class="clip-edge clip-edge-right" title="Recortar final" (mousedown)="onResizeHandleMouseDown($event, track, 'right')"></div>
+            </div>
+          </div>
+          <div class="playhead" [style.transform]="'translate3d(' + timeToPixels(playheadPosition) + 'px, 0, 0)'" aria-hidden="true"><span></span></div>
+        </div>
+      </div>
+      <div class="timeline-status">{{ state.isPlaying ? 'Reproduciendo' : 'Detenido' }} · {{ formatTime(currentTime) }} / {{ formatTime(getProjectDuration()) }}</div>
+    </section>
+  </main>
+
+  <section class="mixer-panel" [class.collapsed]="mixerCollapsed" aria-label="Mezclador">
+    <header class="mixer-header">
+      <div class="mixer-title"><strong>Mezclador</strong><span>Volumen · paneo · Mute · Solo</span></div>
+      <div class="pitch-control" title="Cambia la tonalidad de todas las pistas sin cambiar la duración">
+        <span>PITCH</span>
+        <input type="number" [min]="MIN_SEMITONES" [max]="MAX_SEMITONES" step="1"
+               [ngModel]="pitchDraft ?? transpose" (ngModelChange)="pitchDraft = $event"
+               (keydown.enter)="applyPitch()" aria-label="Pitch global en semitonos">
+        <button type="button" class="pitch-apply" (click)="applyPitch()" [disabled]="pitchProcessing"
+                aria-label="Aplicar cambio de pitch">
+          {{ pitchProcessing ? 'Procesando…' : 'APLICAR PITCH' }}
+        </button>
+        <button type="button" class="pitch-reset" (click)="resetPitch()" [disabled]="pitchProcessing" title="Volver al tono original">0</button>
+        <small>{{ pitchProcessing ? (pitchProgress || 'Procesando audio…') : (pitchError || ('Aplicado: ' + formatSemitones(transpose))) }}</small>
+      </div>
+      <button type="button" class="mixer-toggle" (click)="toggleMixer()" [attr.aria-expanded]="!mixerCollapsed">
+        {{ mixerCollapsed ? '▲ Mostrar mezclador' : '▼ Ocultar mezclador' }}
+      </button>
+    </header>
+
+    <div class="mixer-body" *ngIf="!mixerCollapsed">
+      <article class="mixer-channel master-channel">
+        <div class="channel-title"><span class="channel-color master-color"></span><strong>MASTER</strong></div>
+        <div class="master-controls">
+          <div class="master-meter" aria-label="Medidor de nivel Master"><div [style.width.%]="masterMeterLevel * 100"></div></div>
+          <div class="fader-area master-fader-area">
+            <div class="fader-scale"><span>+12 dB</span><span>0 dB</span><span>−12</span><span>−24</span><span>−36</span><span>−∞</span></div>
+            <input type="range" min="0" [max]="FADER_STEPS" step="1" [value]="faderPosition(masterVolume)" (input)="onMasterVolumeInput($event)"
+                   (dblclick)="resetMasterVolume($event)" class="volume-fader-input" aria-label="Volumen Master" title="Doble clic para restablecer a 0.0 dB" orient="vertical">
+          </div>
+          <label class="volume-db-editor" title="Escribe el volumen en decibelios">
+            <input type="number" min="-60" max="12" step="0.1" class="volume-db-input master-volume-db-input"
+                   [ngModel]="masterVolumeDbText()" (ngModelChange)="setMasterVolumeDbDraft($event)"
+                   (blur)="commitMasterVolumeDb()" (keydown.enter)="commitMasterVolumeDb()"
+                   aria-label="Volumen Master en dB">
+            <span>dB</span>
+          </label>
+          <span class="master-percent">{{ (masterVolume * 100).toFixed(0) }}%</span>
+        </div>
+      </article>
+
+      <div class="mixer-channel-strip">
+        <article *ngFor="let track of state.tracks; trackBy: trackById" class="mixer-channel track-channel"
+                 [class.muted]="track.muted" [class.solo]="track.solo">
+          <div class="channel-title">
+            <span class="channel-color" [style.backgroundColor]="getTrackColor(track)"></span>
+            <input type="text" [ngModel]="track.name" (ngModelChange)="onTrackNameChange(track.id, $event)" aria-label="Nombre de canal">
+          </div>
+          <div class="pan-section">
+            <span class="control-label">PAN</span>
+            <div class="pan-knob" role="slider" tabindex="0" aria-label="Paneo estéreo"
+                 [attr.aria-valuemin]="-100" [attr.aria-valuemax]="100" [attr.aria-valuenow]="Math.round(track.pan * 100)"
+                 [style.--pan]="track.pan" (pointerdown)="onPanPointerDown($event, track.id)"
+                 (pointermove)="onPanPointerMove($event, track.id)" (pointerup)="onPanPointerUp($event)" (pointercancel)="onPanPointerUp($event)"
+                 (dblclick)="centerPan(track.id)" (keydown)="onPanKeydown($event, track.id)" title="Arrastra verticalmente · doble clic para centrar">
+              <span class="pan-knob-indicator"></span><span class="pan-knob-center"></span>
+            </div>
+            <div class="pan-readout">{{ panLabel(track.pan) }}</div>
+            <div class="pan-scale"><span>L</span><span>C</span><span>R</span></div>
+          </div>
+          <div class="channel-meter" aria-label="Medidor de nivel de pista"><div [style.width.%]="track.meterLevel * 100"></div></div>
+          <div class="track-fader-row">
+            <div class="fader-scale"><span>+12 dB</span><span>0 dB</span><span>−12</span><span>−24</span><span>−36</span><span>−∞</span></div>
+            <input type="range" min="0" [max]="FADER_STEPS" step="1" [value]="faderPosition(track.volume)"
+                   (input)="onTrackVolumeInput(track.id, $event)" (dblclick)="resetTrackVolume(track.id, $event)"
+                   class="volume-fader-input" [attr.aria-label]="'Volumen ' + track.name"
+                   title="Doble clic para restablecer a 0.0 dB" orient="vertical">
+            <div class="fader-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <label class="volume-db-editor" [title]="'Introduce el volumen de ' + track.name + ' en dB'">
+            <input type="number" min="-60" max="12" step="0.1" class="volume-db-input"
+                   [ngModel]="trackVolumeDbText(track)" (ngModelChange)="setTrackVolumeDbDraft(track.id, $event)"
+                   (blur)="commitTrackVolumeDb(track.id)" (keydown.enter)="commitTrackVolumeDb(track.id)"
+                   [attr.aria-label]="'Volumen en dB de ' + track.name">
+            <span>dB</span>
+          </label>
+          <div class="channel-buttons">
+            <button type="button" class="mute-btn" [class.active]="track.muted" (click)="toggleMute(track.id)" [attr.aria-pressed]="track.muted">MUTE</button>
+            <button type="button" class="solo-btn" [class.active]="track.solo" (click)="toggleSolo(track.id)" [attr.aria-pressed]="track.solo">SOLO</button>
+          </div>
+          <div class="channel-pitch">
+            <span class="pitch-label">PITCH</span>
+            <input class="pitch-input" type="number" [min]="MIN_SEMITONES" [max]="MAX_SEMITONES" step="1"
+                   [ngModel]="getTrackPitchDraft(track.id)"
+                   (ngModelChange)="setTrackPitchDraft(track.id, $event)"
+                   (keydown.enter)="applyTrackPitch(track.id)"
+                   title="Offset de esta pista, se suma al pitch global"
+                   aria-label="Pitch de pista en semitonos">
+            <button type="button" class="pitch-apply-track" (click)="applyTrackPitch(track.id)"
+                    [disabled]="isTrackBusy(track.id)"
+                    aria-label="Aplicar pitch de pista">
+              {{ trackPitchLabel(track.id) }}
+            </button>
+          </div>
+        </article>
+        <div *ngIf="state.tracks.length === 0" class="mixer-empty">Los canales aparecerán aquí al importar audio.</div>
+      </div>
+    </div>
+  </section>
+</div>

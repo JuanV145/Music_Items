@@ -1,9 +1,13 @@
 <header class="app-header">
-  @if (isHome()) {
-  <div class="logo">
-    ♩ Cifrado <span>Musical</span>
+  <div class="logo" aria-label="Local Music">
+    <img class="logo-mark" src="assets/localchurch-brand/logo-localchurch.png" alt="" aria-hidden="true">
+    <span class="logo-name">Local <strong>Music</strong></span>
   </div>
-  }
+
+  <div class="section-title" aria-live="polite">
+    <span class="section-title-kicker">ESTÁS EN</span>
+    <span class="section-title-text">{{ currentSectionLabel }}</span>
+  </div>
 
   <nav class="menu-wrapper" aria-label="Navegación principal">
     <button class="menu-btn" (click)="toggleMenu()" aria-label="Toggle menu" [attr.aria-expanded]="isMenuOpen()">

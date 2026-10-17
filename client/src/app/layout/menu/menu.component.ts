@@ -1,7 +1,5 @@
-import { Component, signal, inject } from '@angular/core';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map } from 'rxjs/operators';
+import { Component, signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 interface MenuItem {
   label: string;
@@ -20,24 +18,22 @@ interface MenuItem {
   }
 })
 export class MenuComponent {
-  private readonly router = inject(Router);
-
   readonly isMenuOpen = signal(false);
-
-  readonly isHome = toSignal(
-    this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map(e => e.urlAfterRedirects === '/' || e.urlAfterRedirects === '')
-    ),
-    { initialValue: this.router.url === '/' || this.router.url === '' }
-  );
 
   readonly menuItems: MenuItem[] = [
     { label: 'Inicio', path: '', exact: true },
     { label: 'Visualizador de canciones', path: 'visualizador' },
     { label: 'Modificar canciones', path: 'modificar' },
-    { label: 'Metrónomo', path: 'metronomo' }
+    { label: 'Metrónomo', path: 'metronomo' },
+    { label: 'DAW', path: 'daw' }
   ];
+
+  constructor(private readonly router: Router) {}
+
+  get currentSectionLabel(): string {
+    const currentPath = this.router.url.split(/[?#]/, 1)[0].replace(/^\/+|\/+$/g, '');
+    return this.menuItems.find(item => item.path === currentPath)?.label ?? 'Inicio';
+  }
 
   toggleMenu(): void {
     this.isMenuOpen.update(open => !open);
